@@ -12,12 +12,15 @@ export default function useRevertableData(defaultValues) {
     []
   );
   const updateValue = useCallback(
-    (key, value) =>
-      setNewValues((prev) =>
-        defaultValues[key] === value
+    (key, value) => {
+      setNewValues((prev) => {
+        const realValue =
+          typeof value === "function" ? value(prev[key]) : value;
+        return defaultValues[key] === realValue
           ? JSON.parse(JSON.stringify({ ...prev, [key]: undefined }))
-          : { ...prev, [key]: value }
-      ),
+          : { ...prev, [key]: realValue };
+      });
+    },
     [defaultValues]
   );
   const isChanged = useCallback(
